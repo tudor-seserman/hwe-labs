@@ -2,9 +2,9 @@ import os
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 
-# Load environment variables.
-from dotenv import load_dotenv
-load_dotenv()
+# # Load environment variables.
+# from dotenv import load_dotenv
+# load_dotenv()
 
 aws_access_key_id = os.environ.get("AWS_ACCESS_KEY_ID")
 aws_secret_access_key = os.environ.get("AWS_SECRET_ACCESS_KEY")
@@ -34,11 +34,11 @@ spark = SparkSession.builder \
 # You will use the "reviews" dataframe defined here to answer all the questions below...
 
 # reviews = spark.read.csv("resources/reviews.tsv.gz", sep="\t", header=True)
-reviews = spark.read.parquet(
-    "s3a://hwe-fall-2023/tseserman/bronze/reviews", sep="\t", header=True)
+# reviews = spark.read.parquet(
+#     "s3a://hwe-fall-2023/tseserman/bronze/reviews", sep="\t", header=True)
 
 # Question 2: Display the schema of the dataframe.
-reviews.printSchema()
+# reviews.printSchema()
 
 # Question 3: How many records are in the dataframe?
 # Store this number in a variable named "reviews_count".
@@ -96,12 +96,14 @@ reviews.printSchema()
 # Make sure to write it using overwrite mode: append will keep appending duplicates, which will cause problems in later labs...
 # There are no questions to answer about this data set right now, but you will use it in a later lab...
 
-# spark.read.csv("resources/customers.tsv.gz", sep='\t', header=True)\
-#     .write.parquet("s3a://hwe-fall-2023/tseserman/bronze/customers", mode="overwrite")
+spark.read.csv("resources/customers.tsv.gz", sep='\t', header=True)\
+    .write.parquet("s3a://hwe-fall-2023/tseserman/bronze/customers", mode="overwrite")
 
 
 # Stop the SparkSession
 spark.stop()
+
+
 #    "CAST(marketplace AS STRING)",
 #         "CAST(customer_id AS INTEGER)",
 #         "CAST(review_id AS STRING)",

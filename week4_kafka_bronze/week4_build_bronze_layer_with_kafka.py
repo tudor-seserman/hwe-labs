@@ -6,6 +6,7 @@ from pyspark.sql.functions import *
 from dotenv import load_dotenv
 load_dotenv()
 
+
 def getScramAuthString(username, password):
     return f"""org.apache.kafka.common.security.scram.ScramLoginModule required
    username="{username}"
@@ -55,15 +56,15 @@ df = spark \
 # Process the received data
 query = df\
     .withColumn('marketplace', split(df['value'], '\t').getItem(0))\
-    .withColumn('customer_id', split(df['value'], '\t').getItem(1))\
+    .withColumn('customer_id', (split(df['value'], '\t').getItem(1).cast("integer")))\
     .withColumn('review_id', split(df['value'], '\t').getItem(2))\
     .withColumn('product_id', split(df['value'], '\t').getItem(3))\
     .withColumn('product_parent', split(df['value'], '\t').getItem(4))\
     .withColumn('product_title', split(df['value'], '\t').getItem(5))\
     .withColumn('product_category', split(df['value'], '\t').getItem(6))\
-    .withColumn('star_rating', split(df['value'], '\t').getItem(7))\
-    .withColumn('helpful_vote', split(df['value'], '\t').getItem(8))\
-    .withColumn('total_votes', split(df['value'], '\t').getItem(9))\
+    .withColumn('star_rating', split(df['value'], '\t').getItem(7).cast("integer"))\
+    .withColumn('helpful_vote', split(df['value'], '\t').getItem(8).cast("integer"))\
+    .withColumn('total_votes', split(df['value'], '\t').getItem(9).cast("integer"))\
     .withColumn('vine', split(df['value'], '\t').getItem(10))\
     .withColumn('verified_purchase', split(df['value'], '\t').getItem(11))\
     .withColumn('review_headline', split(df['value'], '\t').getItem(12))\
@@ -127,3 +128,20 @@ spark.stop()
 #         "CAST(value.review_body AS STRING)",
 #         "CURRENT_TIMESTAMP() as review_timestamp",
 #     )
+
+#  .select(col('value')) \
+#     .selectExpr('value.col1 as marketplace, value.col2 customer_id'
+#                 AND SO ON????
+#                 , (split(df['value'], '\t').getItem(1).cast("integer")))\
+#     .withColumn('review_id', split(df['value'], '\t').getItem(2))\
+#     .withColumn('product_id', split(df['value'], '\t').getItem(3))\
+#     .withColumn('product_parent', split(df['value'], '\t').getItem(4))\
+#     .withColumn('product_title', split(df['value'], '\t').getItem(5))\
+#     .withColumn('product_category', split(df['value'], '\t').getItem(6))\
+#     .withColumn('star_rating', split(df['value'], '\t').getItem(7).cast("integer"))\
+#     .withColumn('helpful_vote', split(df['value'], '\t').getItem(8).cast("integer"))\
+#     .withColumn('total_votes', split(df['value'], '\t').getItem(9).cast("integer"))\
+#     .withColumn('vine', split(df['value'], '\t').getItem(10))\
+#     .withColumn('verified_purchase', split(df['value'], '\t').getItem(11))\
+#     .withColumn('review_headline', split(df['value'], '\t').getItem(12))\
+#     .withColumn('review_timestamp'")
