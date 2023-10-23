@@ -37,30 +37,37 @@ bronze_schema_reviews = StructType([
     StructField('product_parent', StringType(), nullable=False),
     StructField('product_title', StringType(), nullable=False),
     StructField('product_category', StringType(), nullable=False),
-    StructField('star_rating', StringType(), nullable=False),
-    StructField('helpful_vote', StringType(), nullable=False),
-    StructField('total_votes', StringType(), nullable=False),
+    StructField('star_rating', IntegerType(), nullable=False),
+    StructField('helpful_vote', IntegerType(), nullable=False),
+    StructField('total_votes', IntegerType(), nullable=False),
     StructField('vine', StringType(), nullable=False),
     StructField('verified_purchase', StringType(), nullable=False),
     StructField('review_headline', StringType(), nullable=False),
+    StructField('review_body', StringType(), nullable=False),
+    StructField('purchase_date', StringType(), nullable=False),
     StructField('review_timestamp', TimestampType(), nullable=False)])
 
 
-# bronze_schema_customers=StructType(
-#     StructType(),
-# )
+bronze_schema_customers = StructType([
+    StructField('customer_id', StringType(), nullable=False),
+    StructField('customer_name', StringType(), nullable=False),
+    StructField('gender', StringType(), nullable=False),
+    StructField('date_of_birth', StringType(), nullable=False),
+    StructField('city', StringType(), nullable=False),
+    StructField('state', StringType(), nullable=False)
+])
 
 bronze_reviews = spark.readStream.schema(bronze_schema_reviews).parquet(
     "s3a://hwe-fall-2023/tseserman/bronze/reviews")
 
 
-bronze_customers = spark.read.parquet(
+bronze_customers = spark.read.schema(bronze_schema_customers).parquet(
     "s3a://hwe-fall-2023/tseserman/bronze/customers", sep='\t', header=True)
 
 
 silver_data = bronze_customers.join(bronze_reviews, "customer_id")
 
-silver_data.printSchema()
+# silver_data.printSchema()
 
 streaming_query = silver_data.select('*').filter("verified_purchase='Y'")\
     .writeStream\
@@ -68,7 +75,7 @@ streaming_query = silver_data.select('*').filter("verified_purchase='Y'")\
     .format("parquet")\
     .option("path",
             "s3a://hwe-fall-2023/tseserman/silver/reviews", )\
-    .option("checkpointLocation", "/tmp/silver-checkpoint")\
+    .option("checkpointLocation", "/tmp/silver-checkpoint")
 
 
 streaming_query.start().awaitTermination()

@@ -56,7 +56,7 @@ df = spark \
 # Process the received data
 query = df\
     .withColumn('marketplace', split(df['value'], '\t').getItem(0))\
-    .withColumn('customer_id', (split(df['value'], '\t').getItem(1).cast("integer")))\
+    .withColumn('customer_id', split(df['value'], '\t').getItem(1))\
     .withColumn('review_id', split(df['value'], '\t').getItem(2))\
     .withColumn('product_id', split(df['value'], '\t').getItem(3))\
     .withColumn('product_parent', split(df['value'], '\t').getItem(4))\
@@ -68,6 +68,8 @@ query = df\
     .withColumn('vine', split(df['value'], '\t').getItem(10))\
     .withColumn('verified_purchase', split(df['value'], '\t').getItem(11))\
     .withColumn('review_headline', split(df['value'], '\t').getItem(12))\
+    .withColumn('review_body', split(df['value'], '\t').getItem(13))\
+    .withColumn('purchase_date', split(df['value'], '\t').getItem(14))\
     .withColumn('review_timestamp', current_timestamp())\
     .writeStream\
     .outputMode("append")\
@@ -130,7 +132,7 @@ spark.stop()
 #     )
 
 #  .select(col('value')) \
-#     .selectExpr('value.col1 as marketplace, value.col2 customer_id'
+#     .selectExpr('value.col1 as marketplace, value.col2 as customer_id'
 #                 AND SO ON????
 #                 , (split(df['value'], '\t').getItem(1).cast("integer")))\
 #     .withColumn('review_id', split(df['value'], '\t').getItem(2))\
