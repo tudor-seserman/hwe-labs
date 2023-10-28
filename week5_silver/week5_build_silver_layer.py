@@ -67,9 +67,8 @@ bronze_customers = spark.read.schema(bronze_schema_customers).parquet(
 
 silver_data = bronze_customers.join(bronze_reviews, "customer_id")
 
-# silver_data.printSchema()
 
-streaming_query = silver_data.select('*').filter("verified_purchase='Y'")\
+streaming_query = silver_data.filter("verified_purchase='Y'")\
     .writeStream\
     .outputMode("append")\
     .format("parquet")\

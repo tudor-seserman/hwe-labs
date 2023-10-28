@@ -64,8 +64,9 @@ silver_data = spark.readStream.schema(silver_schema).parquet(
 watermarked_data = silver_data.withWatermark("review_timestamp", "10 seconds")
 
 # Define an aggregated dataframe using `groupBy` functionality to summarize that data over any dimensions you may find interesting
-aggregated_data = watermarked_data.groupBy(
-    "review_timestamp", "city", "marketplace").count()
+aggregated_data = watermarked_data.groupBy("review_timestamp", "gender", "state",
+                                           "star_rating", "product_title", "date_of_birth").agg(count("*").alias("sum_total"))
+
 
 # Write that aggregate data to S3 under s3a://hwe-$CLASS/$HANDLE/gold/fact_review using append mode and a checkpoint location of `/tmp/gold-checkpoint`
 write_gold_query = aggregated_data\
@@ -73,8 +74,8 @@ write_gold_query = aggregated_data\
     .outputMode("append")\
     .format("delta")\
     .option("path",
-            "s3a://hwe-fall-2023/tseserman/gold/fact_review", )\
-    .option("checkpointLocation", "/tmp/gold-checkpoint")
+            "s3a://hwe-fall-2023/tseserman/gold/fact_review_test")\
+    .option("checkpointLocation", "/tmp/gold-checkpoint_test")
 
 write_gold_query.start().awaitTermination()
 
